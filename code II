@@ -1,0 +1,68 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# URL do arquivo no Google Drive
+file_url = 'https://drive.google.com/uc?id=10SIvm2pOjQxJHmx3Tod7LZsqszBz3QRJ'
+
+# Baixar o arquivo do Google Drive
+dados = pd.read_csv(file_url)
+
+# Verificar se a coluna 'Week' existe
+if 'Week' not in dados.columns:
+    print("Erro: coluna 'Week' não encontrada nos dados CSV. Por favor, verifique se os dados possuem esta coluna.")
+    exit()
+
+# Renomear a coluna 'Week' para 'DateTime'
+dados.rename(columns={'Week': 'DateTime'}, inplace=True)
+
+# Converter a coluna 'DateTime' para formato de data
+try:
+    dados['DateTime'] = pd.to_datetime(dados['DateTime'])
+except pd.errors.ParserError:
+    # Fornecer mensagem informativa e soluções potenciais
+    print("Falha ao converter a coluna 'DateTime' para o formato de data. Considere:")
+    print("- Verificar o formato de data no CSV (por exemplo, '%Y-%m-%d', '%d/%m/%Y')")
+    print("- Especificar o formato durante a conversão: pd.to_datetime(dados['DateTime'], format='%Y-%m-%d')")
+    exit()
+
+# Plotar a tendência de popularidade de cada linguagem de programação ao longo do tempo
+plt.figure(figsize=(14, 7))
+
+plt.plot(dados['DateTime'], dados['Python'], label='Python', color='blue')
+plt.plot(dados['DateTime'], dados['Java'], label='Java', color='orange')
+plt.plot(dados['DateTime'], dados['C++'], label='C++', color='green')
+
+plt.title('Tendência de Popularidade das Linguagens de Programação')
+plt.xlabel('Data')
+plt.ylabel('Popularidade')
+plt.legend()
+plt.grid(True)
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# Calcular a popularidade média de cada linguagem por ano
+dados['Ano'] = dados['DateTime'].dt.year
+media_por_ano = dados.groupby('Ano').mean()
+
+# Plotar a popularidade média de cada linguagem por ano
+plt.figure(figsize=(10, 6))
+
+plt.plot(media_por_ano.index, media_por_ano['Python'], label='Python', marker='o', color='blue')
+plt.plot(media_por_ano.index, media_por_ano['Java'], label='Java', marker='o', color='orange')
+plt.plot(media_por_ano.index, media_por_ano['C++'], label='C++', marker='o', color='green')
+
+plt.title('Popularidade Média das Linguagens de Programação por Ano')
+plt.xlabel('Ano')
+plt.ylabel('Popularidade Média')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Interpretação dos gráficos
+print("Interpretação dos Gráficos:")
+print("- O primeiro gráfico mostra a tendência de popularidade das linguagens de programação Python, Java e C++ ao longo do tempo.")
+print("- O segundo gráfico apresenta a popularidade média de cada linguagem de programação por ano.")
+print("- Podemos observar que a popularidade do Python aumentou significativamente ao longo dos anos, enquanto a popularidade do Java e C++ teve algumas flutuações.")
+print("- No geral, Python se destacou como a linguagem de programação mais popular neste conjunto de dados.")
